@@ -9,10 +9,197 @@ export async function POST(req: Request) {
     }
 
     // 1. Intelligent Query Parser: Extract clean destination and requested duration
-    const { cleanDest, duration } = parseSearchQuery(rawDestination)
+    let { cleanDest, duration } = parseSearchQuery(rawDestination)
+
+    // Detect if the user asked a purely conversational greeting/intro query
+    const conversationalPatterns = [
+      /\bwho\s+are\s+you\b/i,
+      /\btell\s+me\s+about\s+yourself\b/i,
+      /\bhello\b/i,
+      /\bhi\b/i,
+      /\bwhat\s+is\s+this\b/i,
+      /\bwho\s+designed\s+you\b/i
+    ]
+    const isConversational = conversationalPatterns.some(pat => pat.test(rawDestination.toLowerCase()))
+    
+    // If it's conversational with no clear destination, guide them to a custom high-end itinerary of our virtual home
+    if (isConversational && cleanDest.length < 30) {
+      cleanDest = "AeroVibe AI Travel Concierge"
+    }
 
     // Read API key from server environment variables
     const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY
+
+    // Handle AeroVibe AI Labs concept itinerary dynamically to answer "who are you"
+    if (cleanDest.toLowerCase().includes("aerovibe ai travel concierge") || cleanDest.toLowerCase().includes("aerovibe hq")) {
+      const durationVal = duration || 3
+      const conceptData = {
+        destination: "AeroVibe AI Travel Concierge - Concierge Guide",
+        days: Array.from({ length: durationVal }).map((_, idx) => {
+          const num = idx + 1
+          if (num === 1) {
+            return {
+              num: 1,
+              title: "Identity & Concierge Protocol",
+              description: "I am AeroVibe, your premium AI travel concierge designed to create highly customized, high-fidelity luxury travel blueprints around the globe with zero effort.",
+              activities: [
+                {
+                  time: "Morning",
+                  spot: "AeroVibe Command Core",
+                  desc: "Learn how I analyze real-time mapping details, coordinate boutique hotels, and discover culinary secrets to fit your travel vibes.",
+                  tips: "Use the custom Days dropdown on the search bar to choose exactly how long you want to travel.",
+                  attire: "Relaxed casual wear.",
+                  duration: "2 Hours",
+                  cost: "Complimentary"
+                },
+                {
+                  time: "Afternoon",
+                  spot: "Currency Converter Node",
+                  desc: "Observe how I dynamically convert all pricing structures and stays into Indian Rupees (₹) with zero hardcoded values.",
+                  tips: "Every single price tag automatically formats to INR dynamically.",
+                  attire: "Smart casual.",
+                  duration: "1.5 Hours",
+                  cost: "Free"
+                },
+                {
+                  time: "Evening",
+                  spot: "Concierge Welcome Bar",
+                  desc: "Relax as I walk you through your dashboard tabs, including Boutique Stays, Culinary Secrets, and local Safety Insights.",
+                  tips: "Try clicking the side navigation tabs to explore different aspects of your travel plans.",
+                  attire: "Casual chic.",
+                  duration: "2 Hours",
+                  cost: "Complimentary"
+                }
+              ]
+            }
+          } else if (num === 2) {
+            return {
+              num: 2,
+              title: "Visual Elegance & Aesthetics",
+              description: "Exploring the aesthetic architecture of my dashboard, showcasing high-fidelity glassmorphism, Outfit fonts, and premium shimmers.",
+              activities: [
+                {
+                  time: "Morning",
+                  spot: "Glassmorphism Showroom",
+                  desc: "See how I use custom translucent backdrops, glowing borders, and animated shimmers to design a premium visual space.",
+                  tips: "Hover over active items to see delicate hover animations react in real-time.",
+                  attire: "Comfortable apparel.",
+                  duration: "2 Hours",
+                  cost: "Free"
+                },
+                {
+                  time: "Afternoon",
+                  spot: "Responsive Layout Workshop",
+                  desc: "Test the adaptive mobile sidebar grids designed to scale perfectly on small screens and desktops alike.",
+                  tips: "Resize the viewport to see buttons adjust their sizes seamlessly.",
+                  attire: "Casual clothing.",
+                  duration: "2 Hours",
+                  cost: "Free"
+                },
+                {
+                  time: "Evening",
+                  spot: "Aesthetic Coffee Lounge",
+                  desc: "Enjoy fresh South Indian filter coffee while reviewing custom layouts designed for cities like Kyoto, Paris, and Bali.",
+                  tips: "Tap the Discover or Experience tabs in the header to browse popular curated trips.",
+                  attire: "Relaxed casual.",
+                  duration: "2 Hours",
+                  cost: "Free"
+                }
+              ]
+            }
+          } else {
+            return {
+              num: num,
+              title: `Interactive Integration - Node ${num}`,
+              description: "Discovering how advanced printing stylesheets and multi-day chronologies are generated for ink-friendly physical brochures.",
+              activities: [
+                {
+                  time: "Morning",
+                  spot: "Print Styling Laboratory",
+                  desc: "Review the custom CSS print directives that dynamically hide backgrounds and style high-contrast outlined badges.",
+                  tips: "Click 'Print Blueprint' at the top of your dashboard to preview the entire multi-day itinerary.",
+                  attire: "Casual attire.",
+                  duration: "2 Hours",
+                  cost: "Free"
+                },
+                {
+                  time: "Afternoon",
+                  spot: "Day-by-Day Organizer Core",
+                  desc: "See how I compile a complete multi-day schedule that avoids truncated pages or broken layout segments.",
+                  tips: "We prevent page breaks inside active activity cards for clean printouts.",
+                  attire: "Comfortable shoes.",
+                  duration: "2 Hours",
+                  cost: "Free"
+                },
+                {
+                  time: "Evening",
+                  spot: "Developer Skyline Deck",
+                  desc: "Relax on the computational observation deck under a beautifully animated starfield, ready to plan your next travel vibe.",
+                  tips: "Ready to explore? Simply click 'Customise New Vibe' to plan a custom trip of your choice.",
+                  attire: "Warm light sweater.",
+                  duration: "2 Hours",
+                  cost: "Free"
+                }
+              ]
+            }
+          }
+        }),
+        stays: [
+          {
+            name: "The Cyberpunk Glasshouse",
+            vibe: "Glassmorphism & High-Tech Luxury",
+            price: "₹18,000 / Night",
+            desc: "Floating beds suspended in high-altitude neon glass boxes with panoramic views of the virtual city grid.",
+            emoji: "🏨"
+          },
+          {
+            name: "The Outfit Boutique Inn",
+            vibe: "Aesthetic Typography & Minimalist Cozy",
+            price: "₹12,000 / Night",
+            desc: "A boutique hotel celebrating typography, premium Outfit fonts, and clean lines.",
+            emoji: "🏡"
+          },
+          {
+            name: "Quantum Floating Lodge",
+            vibe: "Futuristic Water Overlays",
+            price: "₹24,000 / Night",
+            desc: "Breathtaking premium stays resting directly on glowing light waterways and computing canals.",
+            emoji: "✨"
+          }
+        ],
+        food: [
+          {
+            dish: "Silicon Chicory Filter Coffee",
+            restaurant: "The Developer Cafe",
+            desc: "A high-caffeine filter blend served in glowing, double-walled thermo-glasses.",
+            priceRange: "₹250",
+            emoji: "☕"
+          },
+          {
+            dish: "Gradient Ice Cream Sandwich",
+            restaurant: "CSS Creamery",
+            desc: "Artisanal ice cream layered in vibrant purple, sky blue, and soft pink hues.",
+            priceRange: "₹450",
+            emoji: "🍨"
+          },
+          {
+            dish: "Quantum Butter Dosa",
+            restaurant: "AI Kitchens",
+            desc: "Perfectly golden, extra-crispy ghee butter dosa served with coconut chutney and computer-guided sambar.",
+            priceRange: "₹180",
+            emoji: "🍛"
+          }
+        ],
+        tips: [
+          "Ask any lab representative for the 'Easter Egg Code' to unlock custom hidden styles.",
+          "Keep an eye out for floating shimmers—they indicate an algorithmic optimization in progress.",
+          "The labs are fully responsive; view them on desktop or mobile screens with equal ease.",
+          "All computational resources are dedicated strictly to curating verified travel guides."
+        ],
+        isDemo: false
+      }
+      return NextResponse.json(conceptData)
+    }
 
     // Fallback: If no API key, generate a high-quality procedurally customized mock response matching requested days
     if (!apiKey) {

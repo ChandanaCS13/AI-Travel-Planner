@@ -340,6 +340,7 @@ interface AeroVibeHeroProps {
 
 export default function AeroVibeHero({ onPlanTrip }: AeroVibeHeroProps) {
   const [destination, setDestination] = useState("")
+  const [durationDays, setDurationDays] = useState(3)
   const [carouselIndex, setCarouselIndex] = useState(0)
 
   // Auto-cycle boarding pass carousel every 5 seconds (paused if user is actively typing custom input)
@@ -351,11 +352,25 @@ export default function AeroVibeHero({ onPlanTrip }: AeroVibeHeroProps) {
     return () => clearInterval(interval)
   }, [destination])
 
-  const handleSearch = useCallback((dest?: string) => {
-    const d = dest ?? destination ?? ""
-    const finalDest = d.trim() ? d.trim() : "Bali for 10 days"
-    onPlanTrip?.(finalDest)
-  }, [destination, onPlanTrip])
+  const handleSearch = useCallback((dest?: string, daysOverride?: number) => {
+    const activeDays = daysOverride ?? durationDays
+    const rawInput = (dest ?? destination ?? "").trim()
+    
+    if (!rawInput) {
+      // Default fallback
+      onPlanTrip?.("Bali for 3 days")
+      return
+    }
+
+    // Check if user already wrote days inside the input text
+    const hasDaysWord = /\b\d+\s*days?\b/i.test(rawInput)
+    if (hasDaysWord) {
+      onPlanTrip?.(rawInput)
+    } else {
+      // Clean query and append selector's selected days count
+      onPlanTrip?.(`${rawInput} for ${activeDays} days`)
+    }
+  }, [destination, durationDays, onPlanTrip])
 
   return (
     <div
@@ -421,10 +436,16 @@ export default function AeroVibeHero({ onPlanTrip }: AeroVibeHeroProps) {
           <nav className="flex items-center gap-2">
             <button
               onClick={() => {
-                const options = ["Kyoto, Japan for 7 days", "Paris, France for 5 days", "Bali, Indonesia for 10 days", "Amalfi, Italy for 6 days"]
+                const options = [
+                  { d: "Kyoto, Japan", days: 7 },
+                  { d: "Paris, France", days: 5 },
+                  { d: "Bali, Indonesia", days: 10 },
+                  { d: "Amalfi, Italy", days: 6 }
+                ]
                 const random = options[Math.floor(Math.random() * options.length)]
-                setDestination(random)
-                handleSearch(random)
+                setDestination(random.d)
+                setDurationDays(random.days)
+                handleSearch(random.d, random.days)
               }}
               className="hidden sm:block px-4 py-2 rounded-full text-xs font-medium border border-white/20 text-white/80 hover:bg-white/10 hover:border-white/40 hover:text-white transition-all"
             >
@@ -432,10 +453,14 @@ export default function AeroVibeHero({ onPlanTrip }: AeroVibeHeroProps) {
             </button>
             <button
               onClick={() => {
-                const experiences = ["Reykjavik, Iceland for 8 days", "Amalfi Coast, Italy for 7 days"]
+                const experiences = [
+                  { d: "Reykjavik, Iceland", days: 8 },
+                  { d: "Amalfi Coast, Italy", days: 7 }
+                ]
                 const random = experiences[Math.floor(Math.random() * experiences.length)]
-                setDestination(random)
-                handleSearch(random)
+                setDestination(random.d)
+                setDurationDays(random.days)
+                handleSearch(random.d, random.days)
               }}
               className="hidden sm:block px-4 py-2 rounded-full text-xs font-medium border border-white/20 text-white/80 hover:bg-white/10 hover:border-white/40 hover:text-white transition-all"
             >
@@ -498,14 +523,14 @@ export default function AeroVibeHero({ onPlanTrip }: AeroVibeHeroProps) {
 
             {/* Search bar */}
             <div
-              className="flex items-center rounded-2xl px-4 py-1.5 transition-all focus-within:shadow-[0_0_40px_rgba(108,47,247,0.3)]"
+              className="flex items-center rounded-2xl px-4 py-1.5 transition-all focus-within:shadow-[0_0_40px_rgba(108,47,247,0.3)] gap-2"
               style={{
                 background: "rgba(255,255,255,0.08)",
                 border: "1px solid rgba(255,255,255,0.15)",
                 boxShadow: "0 0 40px rgba(108,47,247,0.15)",
               }}
             >
-              <span className="text-white/40 mr-3 text-base flex-shrink-0">📍</span>
+              <span className="text-white/40 text-base flex-shrink-0">📍</span>
               <input
                 type="text"
                 placeholder="Where is your heart pointing? (e.g. Kyoto...)"
@@ -515,9 +540,27 @@ export default function AeroVibeHero({ onPlanTrip }: AeroVibeHeroProps) {
                 className="flex-1 bg-transparent border-none outline-none text-white placeholder-white/35 text-sm py-2.5"
                 style={{ fontFamily: "inherit", minWidth: 0 }}
               />
+
+              {/* Dynamic Number of Days Dropdown Select */}
+              <div className="flex items-center gap-1.5 flex-shrink-0 border-l border-white/10 pl-3">
+                <span className="text-xs text-white/45 hidden sm:inline">Days:</span>
+                <select
+                  value={durationDays}
+                  onChange={(e) => setDurationDays(Number(e.target.value))}
+                  className="bg-[#0f0e26]/80 backdrop-blur-xl border border-white/10 text-white/90 text-xs font-semibold rounded-xl px-2.5 py-1.5 cursor-pointer outline-none focus:border-purple-500/50 hover:bg-white/5 transition-all"
+                  style={{ colorScheme: "dark" }}
+                >
+                  {[...Array(15)].map((_, i) => (
+                    <option key={i + 1} value={i + 1} className="bg-[#0c0d2b] text-white">
+                      {i + 1} Day{i + 1 > 1 ? "s" : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <button
                 onClick={() => handleSearch()}
-                className="ml-2 flex-shrink-0 px-5 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-95"
+                className="flex-shrink-0 px-5 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-95"
                 style={{
                   background: "linear-gradient(135deg, #6c2ff7, #0ea5e9)",
                   boxShadow: "0 0 20px rgba(108,47,247,0.5)",

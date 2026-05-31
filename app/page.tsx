@@ -240,6 +240,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"days" | "stays" | "food" | "tips">("days")
   const [selectedDay, setSelectedDay] = useState(1)
   const [expandedActivityIndex, setExpandedActivityIndex] = useState<number | null>(0)
+  const [showIntroModal, setShowIntroModal] = useState(false)
 
   // Reset expanded activity index when day or tab changes
   useEffect(() => {
@@ -258,6 +259,24 @@ export default function Home() {
   }, [view])
 
   const handlePlanTrip = useCallback(async (dest: string) => {
+    // Intercept purely conversational/greeting questions locally for an instant correct reply
+    const conversationalKeywords = [
+      "who are you",
+      "tell me about yourself",
+      "who designed you",
+      "what is this",
+      "tell me correctly",
+      "hi tell me"
+    ]
+    const isConversational = conversationalKeywords.some(keyword => 
+      dest.toLowerCase().includes(keyword)
+    )
+
+    if (isConversational) {
+      setShowIntroModal(true)
+      return
+    }
+
     setDestination(dest)
     setView("loading")
     setLoadingPhraseIndex(0)
@@ -353,6 +372,120 @@ export default function Home() {
             className="w-full h-full"
           >
             <AeroVibeHero onPlanTrip={handlePlanTrip} />
+
+            {/* Custom Premium Conversational Dialog Overlay */}
+            <AnimatePresence>
+              {showIntroModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#050512]/60 backdrop-blur-md">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                    transition={{ duration: 0.4, type: "spring", stiffness: 300, damping: 25 }}
+                    className="relative w-full max-w-xl rounded-3xl p-8 overflow-hidden backdrop-blur-2xl border"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(20,20,45,0.85) 0%, rgba(10,10,30,0.92) 100%)",
+                      borderColor: "rgba(167, 139, 250, 0.25)",
+                      boxShadow: "0 0 50px rgba(108,47,247,0.25), 0 0 100px rgba(14,165,233,0.1)",
+                    }}
+                  >
+                    {/* Glowing Accent Blobs inside Modal */}
+                    <div className="absolute -top-16 -left-16 w-36 h-36 rounded-full bg-purple-600/20 blur-3xl pointer-events-none" />
+                    <div className="absolute -bottom-16 -right-16 w-36 h-36 rounded-full bg-sky-500/20 blur-3xl pointer-events-none" />
+
+                    {/* Top shimmer border */}
+                    <div
+                      className="absolute top-0 left-0 right-0 h-px"
+                      style={{ background: "linear-gradient(90deg, transparent, rgba(167,139,250,0.6), rgba(56,189,248,0.6), transparent)" }}
+                    />
+
+                    {/* Header badge */}
+                    <div className="flex justify-between items-center mb-6">
+                      <span className="text-xs font-semibold tracking-widest uppercase text-purple-300 flex items-center gap-1.5">
+                        🎫 AeroVibe AI Concierge
+                      </span>
+                      <button
+                        onClick={() => setShowIntroModal(false)}
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all text-xs"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    {/* Main Content */}
+                    <div className="space-y-5 relative z-10">
+                      <h3 className="text-2xl font-bold tracking-tight text-white leading-snug">
+                        Who am I?
+                        <br />
+                        <span
+                          style={{
+                            background: "linear-gradient(90deg, #a78bfa 0%, #38bdf8 100%)",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                            backgroundClip: "text",
+                          }}
+                        >
+                          Your Next-Gen Travel Partner
+                        </span>
+                      </h3>
+
+                      <p className="text-sm text-white/70 leading-relaxed">
+                        Hello! I am <strong>AeroVibe</strong>, an advanced AI travel concierge and local specialist. 
+                        Skip hours of tedious research—I am designed to automatically craft personalized, 
+                        high-fidelity multi-day travel blueprints tailored to your vibe.
+                      </p>
+
+                      <div className="space-y-3.5 pt-2">
+                        <h4 className="text-xs font-semibold uppercase tracking-wider text-white/45">
+                          My Premium Capabilities Include:
+                        </h4>
+                        
+                        <div className="grid grid-cols-1 gap-2.5">
+                          {[
+                            { icon: "⚡", bold: "Zero Hardcoded Estimates", text: "All stays, meals, and tickets convert dynamically into Indian Rupees (₹)." },
+                            { icon: "📅", bold: "Highly Structured Itineraries", text: "Morning, Afternoon, and Evening slots populated with custom tips, attire, and durations." },
+                            { icon: "🖨️", bold: "Bespoke Outlined Printing", text: "Formatted cleanly for high-contrast ink-friendly physical brochures." },
+                          ].map((feat, idx) => (
+                            <div key={idx} className="flex gap-3 items-start p-3 rounded-2xl bg-white/5 border border-white/5">
+                              <span className="text-base leading-none">{feat.icon}</span>
+                              <div className="text-xs">
+                                <strong className="text-purple-300 block mb-0.5">{feat.bold}</strong>
+                                <span className="text-white/60">{feat.text}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Call to action buttons */}
+                      <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                        <button
+                          onClick={() => {
+                            setShowIntroModal(false)
+                          }}
+                          className="flex-1 px-5 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-95 text-center cursor-pointer"
+                          style={{
+                            background: "linear-gradient(135deg, #6c2ff7, #0ea5e9)",
+                            boxShadow: "0 0 20px rgba(108,47,247,0.4)",
+                          }}
+                        >
+                          Let's Plan a Trip ✈
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowIntroModal(false)
+                            handlePlanTrip("Kyoto for 5 days")
+                          }}
+                          className="px-5 py-3 rounded-xl text-sm font-semibold text-white/80 border border-white/10 hover:bg-white/5 hover:text-white transition-all text-center cursor-pointer"
+                        >
+                          Explore Kyoto (5 Days)
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
 
