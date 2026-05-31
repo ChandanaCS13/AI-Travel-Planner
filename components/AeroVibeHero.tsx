@@ -43,6 +43,94 @@ const POPULAR_DESTINATIONS: Destination[] = [
   { name: "Reykjavik, Iceland", emoji: "🌋", desc: "Northern lights, hot springs, glaciers",      color: "pink"   },
 ]
 
+interface CarouselDay {
+  num: number
+  title: string
+  sub: string
+  chip: string
+  bg: string
+  border: string
+  numBg: string
+  numColor: string
+  chipBg: string
+  chipColor: string
+}
+
+interface PassConfig {
+  destination: string
+  originIata: string
+  originCity: string
+  iata: string
+  fullName: string
+  defaultQuery: string
+  gradient: string
+  glow: string
+  days: CarouselDay[]
+}
+
+const CAROUSEL_PASSES: PassConfig[] = [
+  {
+    destination: "Kyoto",
+    originIata: "DEL",
+    originCity: "Delhi, IN",
+    iata: "KYO",
+    fullName: "Kyoto, Japan",
+    defaultQuery: "Kyoto for 7 days",
+    gradient: "linear-gradient(90deg, transparent, rgba(168,85,247,0.8), rgba(236,72,153,0.8), transparent)",
+    glow: "0 0 60px rgba(168,85,247,0.15), 0 0 100px rgba(236,72,153,0.08)",
+    days: [
+      { num: 1, title: "Arashiyama Bamboo Path", sub: "Walk the soaring green stalks at sunrise", chip: "Morning", bg: "rgba(168,85,247,0.15)", border: "rgba(168,85,247,0.3)", numBg: "rgba(168,85,247,0.5)", numColor: "#d8b4fe", chipBg: "rgba(168,85,247,0.3)", chipColor: "#d8b4fe" },
+      { num: 2, title: "Fushimi Inari Gates", sub: "Trek the 10,000 glowing vermillion shrines", chip: "Full day", bg: "rgba(236,72,153,0.15)", border: "rgba(236,72,153,0.3)", numBg: "rgba(236,72,153,0.5)", numColor: "#f9a8d4", chipBg: "rgba(236,72,153,0.3)", chipColor: "#f9a8d4" },
+      { num: 3, title: "Gion District Tea Houses", sub: "Taste organic matcha in vintage alleys", chip: "Culture", bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.25)", numBg: "rgba(16,185,129,0.4)", numColor: "#6ee7b7", chipBg: "rgba(16,185,129,0.25)", chipColor: "#6ee7b7" }
+    ]
+  },
+  {
+    destination: "Bali",
+    originIata: "BOM",
+    originCity: "Mumbai, IN",
+    iata: "DPS",
+    fullName: "Bali, Indonesia",
+    defaultQuery: "Bali for 10 days",
+    gradient: "linear-gradient(90deg, transparent, rgba(14,165,233,0.8), rgba(16,185,129,0.8), transparent)",
+    glow: "0 0 60px rgba(14,165,233,0.15), 0 0 100px rgba(16,185,129,0.08)",
+    days: [
+      { num: 1, title: "Uluwatu Cliff Sunset", sub: "Witness coastal waves & fire dances", chip: "Evening", bg: "rgba(14,165,233,0.15)", border: "rgba(14,165,233,0.3)", numBg: "rgba(14,165,233,0.5)", numColor: "#7dd3fc", chipBg: "rgba(14,165,233,0.3)", chipColor: "#7dd3fc" },
+      { num: 2, title: "Ubud Rice Terraces", sub: "Swing over infinite cascading green hills", chip: "Full day", bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.25)", numBg: "rgba(16,185,129,0.4)", numColor: "#6ee7b7", chipBg: "rgba(16,185,129,0.25)", chipColor: "#6ee7b7" },
+      { num: 3, title: "Seminyak Beach Lounge", sub: "Catch warm curls & fresh seafood grills", chip: "Leisure", bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.25)", numBg: "rgba(245,158,11,0.4)", numColor: "#fcd34d", chipBg: "rgba(245,158,11,0.25)", chipColor: "#fcd34d" }
+    ]
+  },
+  {
+    destination: "Reykjavik",
+    originIata: "BLR",
+    originCity: "Bengaluru, IN",
+    iata: "KEF",
+    fullName: "Reykjavik, Iceland",
+    defaultQuery: "Reykjavik for 8 days",
+    gradient: "linear-gradient(90deg, transparent, rgba(56,189,248,0.8), rgba(168,85,247,0.8), transparent)",
+    glow: "0 0 60px rgba(56,189,248,0.15), 0 0 100px rgba(168,85,247,0.08)",
+    days: [
+      { num: 1, title: "Golden Circle Geysers", sub: "Watch massive bubbling springs burst", chip: "Sightsee", bg: "rgba(56,189,248,0.15)", border: "rgba(56,189,248,0.3)", numBg: "rgba(56,189,248,0.5)", numColor: "#7dd3fc", chipBg: "rgba(56,189,248,0.3)", chipColor: "#7dd3fc" },
+      { num: 2, title: "Blue Lagoon Retreat", sub: "Soak in hot silica pools amidst lava rocks", chip: "Wellness", bg: "rgba(168,85,247,0.15)", border: "rgba(168,85,247,0.3)", numBg: "rgba(168,85,247,0.5)", numColor: "#d8b4fe", chipBg: "rgba(168,85,247,0.3)", chipColor: "#d8b4fe" },
+      { num: 3, title: "Indigo Aurora Chase", sub: "Track neon curtains dancing in night skies", chip: "Adventure", bg: "rgba(236,72,153,0.15)", border: "rgba(236,72,153,0.3)", numBg: "rgba(236,72,153,0.5)", numColor: "#f9a8d4", chipBg: "rgba(236,72,153,0.3)", chipColor: "#f9a8d4" }
+    ]
+  },
+  {
+    destination: "Amalfi",
+    originIata: "DEL",
+    originCity: "Delhi, IN",
+    iata: "NAP",
+    fullName: "Amalfi Coast, Italy",
+    defaultQuery: "Amalfi for 6 days",
+    gradient: "linear-gradient(90deg, transparent, rgba(236,72,153,0.8), rgba(245,158,11,0.8), transparent)",
+    glow: "0 0 60px rgba(236,72,153,0.15), 0 0 100px rgba(245,158,11,0.08)",
+    days: [
+      { num: 1, title: "Positano Pastel Walk", sub: "Wander historic steps to ocean shores", chip: "Relax", bg: "rgba(236,72,153,0.15)", border: "rgba(236,72,153,0.3)", numBg: "rgba(236,72,153,0.5)", numColor: "#f9a8d4", chipBg: "rgba(236,72,153,0.3)", chipColor: "#f9a8d4" },
+      { num: 2, title: "Ravello Cliff Gardens", sub: "Look over infinite blue sea balconies", chip: "Scenic", bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.25)", numBg: "rgba(245,158,11,0.4)", numColor: "#fcd34d", chipBg: "rgba(245,158,11,0.25)", chipColor: "#fcd34d" },
+      { num: 3, title: "Path of the Gods", sub: "Hike rustic shepherd paths over water", chip: "Trek", bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.25)", numBg: "rgba(16,185,129,0.4)", numColor: "#6ee7b7", chipBg: "rgba(16,185,129,0.25)", chipColor: "#6ee7b7" }
+    ]
+  }
+]
+
 const DEST_COLORS: Record<DestColor, ColorConfig> = {
   purple: {
     card:    "border-purple-500/20 hover:border-purple-400/50",
@@ -252,11 +340,21 @@ interface AeroVibeHeroProps {
 
 export default function AeroVibeHero({ onPlanTrip }: AeroVibeHeroProps) {
   const [destination, setDestination] = useState("")
+  const [carouselIndex, setCarouselIndex] = useState(0)
+
+  // Auto-cycle boarding pass carousel every 5 seconds (paused if user is actively typing custom input)
+  useEffect(() => {
+    if (destination.trim()) return
+    const interval = setInterval(() => {
+      setCarouselIndex((prev) => (prev + 1) % CAROUSEL_PASSES.length)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [destination])
 
   const handleSearch = useCallback((dest?: string) => {
-    const d = dest ?? destination
-    if (!d.trim()) return
-    onPlanTrip?.(d)
+    const d = dest ?? destination ?? ""
+    const finalDest = d.trim() ? d.trim() : "Bali for 10 days"
+    onPlanTrip?.(finalDest)
   }, [destination, onPlanTrip])
 
   return (
@@ -321,14 +419,28 @@ export default function AeroVibeHero({ onPlanTrip }: AeroVibeHeroProps) {
           </div>
 
           <nav className="flex items-center gap-2">
-            {["Discover", "Experiences"].map((label) => (
-              <button
-                key={label}
-                className="hidden sm:block px-4 py-2 rounded-full text-xs font-medium border border-white/20 text-white/80 hover:bg-white/10 hover:border-white/40 hover:text-white transition-all"
-              >
-                {label}
-              </button>
-            ))}
+            <button
+              onClick={() => {
+                const options = ["Kyoto, Japan for 7 days", "Paris, France for 5 days", "Bali, Indonesia for 10 days", "Amalfi, Italy for 6 days"]
+                const random = options[Math.floor(Math.random() * options.length)]
+                setDestination(random)
+                handleSearch(random)
+              }}
+              className="hidden sm:block px-4 py-2 rounded-full text-xs font-medium border border-white/20 text-white/80 hover:bg-white/10 hover:border-white/40 hover:text-white transition-all"
+            >
+              Discover 🌍
+            </button>
+            <button
+              onClick={() => {
+                const experiences = ["Reykjavik, Iceland for 8 days", "Amalfi Coast, Italy for 7 days"]
+                const random = experiences[Math.floor(Math.random() * experiences.length)]
+                setDestination(random)
+                handleSearch(random)
+              }}
+              className="hidden sm:block px-4 py-2 rounded-full text-xs font-medium border border-white/20 text-white/80 hover:bg-white/10 hover:border-white/40 hover:text-white transition-all"
+            >
+              Experiences ✨
+            </button>
             <button
               onClick={() => handleSearch()}
               className="px-4 py-2 rounded-full text-xs font-semibold text-white transition-all hover:brightness-110 active:scale-95"
@@ -445,24 +557,56 @@ export default function AeroVibeHero({ onPlanTrip }: AeroVibeHeroProps) {
             transition={{ duration: 0.8, type: "spring", delay: 0.15 }}
           >
             <div
-              className="rounded-3xl p-6 relative overflow-hidden backdrop-blur-xl"
+              className="rounded-3xl p-6 relative overflow-hidden backdrop-blur-xl transition-all duration-700"
               style={{
                 background: "rgba(255,255,255,0.05)",
                 border: "1px solid rgba(255,255,255,0.12)",
-                boxShadow: "0 0 60px rgba(108,47,247,0.15), 0 0 100px rgba(14,165,233,0.08)",
+                boxShadow: destination.trim() ? "0 0 60px rgba(108,47,247,0.15), 0 0 100px rgba(14,165,233,0.08)" : CAROUSEL_PASSES[carouselIndex].glow,
               }}
             >
               {/* Top shimmer */}
               <div
-                className="absolute top-0 left-0 right-0 h-px"
-                style={{ background: "linear-gradient(90deg, transparent, rgba(108,47,247,0.8), rgba(14,165,233,0.8), transparent)" }}
+                className="absolute top-0 left-0 right-0 h-px transition-all duration-700"
+                style={{ background: destination.trim() ? "linear-gradient(90deg, transparent, rgba(108,47,247,0.8), rgba(14,165,233,0.8), transparent)" : CAROUSEL_PASSES[carouselIndex].gradient }}
               />
 
               {/* Card header */}
               <div className="flex justify-between items-center mb-5">
-                <span className="text-xs font-semibold tracking-widest uppercase text-purple-300">
-                  🎫 Boarding pass
-                </span>
+                <div className="flex items-center gap-1">
+                  <span className="text-xs font-semibold tracking-widest uppercase text-purple-300">
+                    🎫 Boarding pass
+                  </span>
+                  
+                  {/* Manual Carousel controls */}
+                  {!destination.trim() && (
+                    <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-full px-2 py-0.5 ml-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setCarouselIndex((prev) => (prev - 1 + CAROUSEL_PASSES.length) % CAROUSEL_PASSES.length)
+                        }}
+                        className="text-[9px] text-white/50 hover:text-white/90 p-0.5 transition-colors cursor-pointer select-none"
+                        title="Previous Pass"
+                      >
+                        ◀
+                      </button>
+                      <span className="text-[8px] font-bold text-white/60 tracking-wider">
+                        {carouselIndex + 1}/{CAROUSEL_PASSES.length}
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setCarouselIndex((prev) => (prev + 1) % CAROUSEL_PASSES.length)
+                        }}
+                        className="text-[9px] text-white/50 hover:text-white/90 p-0.5 transition-colors cursor-pointer select-none"
+                        title="Next Pass"
+                      >
+                        ▶
+                      </button>
+                    </div>
+                  )}
+                </div>
+
                 <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-400">
                   <span
                     className="w-1.5 h-1.5 rounded-full animate-pulse"
@@ -473,13 +617,21 @@ export default function AeroVibeHero({ onPlanTrip }: AeroVibeHeroProps) {
               </div>
 
               {/* Route visual */}
-              <div
+              <motion.div
+                key={`route-${carouselIndex}`}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
                 className="flex items-center justify-between p-4 rounded-2xl mb-4"
                 style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
               >
                 <div className="text-center">
-                  <div className="text-3xl font-bold tracking-tight text-purple-400">SYS</div>
-                  <div className="text-[10px] text-white/40 mt-0.5 tracking-wide">Travel Engine</div>
+                  <div className="text-3xl font-bold tracking-tight text-purple-400">
+                    {destination.trim() ? "DEL" : CAROUSEL_PASSES[carouselIndex].originIata}
+                  </div>
+                  <div className="text-[10px] text-white/40 mt-0.5 tracking-wide">
+                    {destination.trim() ? "Delhi, IN" : CAROUSEL_PASSES[carouselIndex].originCity}
+                  </div>
                 </div>
                 <div className="flex-1 flex items-center justify-center px-3 relative">
                   <div
@@ -496,10 +648,14 @@ export default function AeroVibeHero({ onPlanTrip }: AeroVibeHeroProps) {
                   </motion.span>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold tracking-tight text-sky-400">YOU</div>
-                  <div className="text-[10px] text-white/40 mt-0.5 tracking-wide">Destination</div>
+                  <div className="text-3xl font-bold tracking-tight text-sky-400">
+                    {destination.trim() ? (destination.trim().split(" ")[0].slice(0, 3).toUpperCase()) : CAROUSEL_PASSES[carouselIndex].iata}
+                  </div>
+                  <div className="text-[10px] text-white/40 mt-0.5 tracking-wide truncate max-w-[80px]">
+                    {destination.trim() ? destination.trim().split(" ")[0] : CAROUSEL_PASSES[carouselIndex].destination}
+                  </div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Info grid */}
               <div className="grid grid-cols-3 gap-2 mb-4">
@@ -522,18 +678,29 @@ export default function AeroVibeHero({ onPlanTrip }: AeroVibeHeroProps) {
               </div>
 
               {/* Day strips */}
-              <div className="space-y-2 mb-4">
-                {(
-                  [
-                    { num: 1, title: "Arrival & neighbourhood immersion", sub: "Street food, temples, hidden alleys", chip: "Morning",   bg: "rgba(108,47,247,0.15)", border: "rgba(108,47,247,0.3)",  numBg: "rgba(108,47,247,0.5)", numColor: "#c4a8ff", chipBg: "rgba(108,47,247,0.3)",  chipColor: "#c4a8ff" },
-                    { num: 2, title: "Cultural deep-dive & museums",       sub: "Art galleries, heritage walks",      chip: "Full day",  bg: "rgba(14,165,233,0.15)", border: "rgba(14,165,233,0.3)",  numBg: "rgba(14,165,233,0.5)", numColor: "#7dd3fc", chipBg: "rgba(14,165,233,0.3)",  chipColor: "#7dd3fc" },
-                    { num: 3, title: "Nature trails & scenic escapes",      sub: "Mountain views, local markets",     chip: "Adventure", bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.25)", numBg: "rgba(16,185,129,0.4)", numColor: "#6ee7b7", chipBg: "rgba(16,185,129,0.25)", chipColor: "#6ee7b7" },
-                  ] as const
+              <motion.div
+                key={`days-${carouselIndex}`}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut", delay: 0.05 }}
+                className="space-y-2 mb-4"
+              >
+                {(destination.trim()
+                  ? [
+                      { num: 1, title: `Arrival & ${destination.trim().split(" ")[0]} immersion`, sub: "Street food, temples, hidden alleys", chip: "Morning",   bg: "rgba(108,47,247,0.15)", border: "rgba(108,47,247,0.3)",  numBg: "rgba(108,47,247,0.5)", numColor: "#c4a8ff", chipBg: "rgba(108,47,247,0.3)",  chipColor: "#c4a8ff" },
+                      { num: 2, title: `${destination.trim().split(" ")[0]} heritage walks`,   sub: "Art galleries, local museums",      chip: "Full day",  bg: "rgba(14,165,233,0.15)", border: "rgba(14,165,233,0.3)",  numBg: "rgba(14,165,233,0.5)", numColor: "#7dd3fc", chipBg: "rgba(14,165,233,0.3)",  chipColor: "#7dd3fc" },
+                      { num: 3, title: `${destination.trim().split(" ")[0]} scenic escapes`,     sub: "Mountain views, local markets",     chip: "Adventure", bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.25)", numBg: "rgba(16,185,129,0.4)", numColor: "#6ee7b7", chipBg: "rgba(16,185,129,0.25)", chipColor: "#6ee7b7" },
+                    ]
+                  : CAROUSEL_PASSES[carouselIndex].days
                 ).map((day) => (
                   <div
                     key={day.num}
-                    className="flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-all hover:brightness-125"
-                    style={{ background: day.bg, border: `1px solid ${day.border}` }}
+                    onClick={() => {
+                      const activeQuery = destination.trim() ? destination : CAROUSEL_PASSES[carouselIndex].defaultQuery
+                      handleSearch(activeQuery)
+                    }}
+                    className="flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-all hover:brightness-125 border border-transparent"
+                    style={{ background: day.bg, borderColor: day.border }}
                   >
                     <div
                       className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0"
@@ -553,24 +720,45 @@ export default function AeroVibeHero({ onPlanTrip }: AeroVibeHeroProps) {
                     </div>
                   </div>
                 ))}
-              </div>
+              </motion.div>
 
               {/* Action buttons */}
-              <div className="flex gap-2">
+              <div className="flex gap-2 mb-2">
                 <button
-                  onClick={() => handleSearch()}
+                  onClick={() => {
+                    const activeQuery = destination.trim() ? destination : CAROUSEL_PASSES[carouselIndex].defaultQuery
+                    handleSearch(activeQuery)
+                  }}
                   className="flex-1 py-3 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-1.5 transition-all hover:brightness-110 active:scale-95"
                   style={{ background: "linear-gradient(135deg, #6c2ff7, #0ea5e9)", boxShadow: "0 0 20px rgba(108,47,247,0.4)", fontFamily: "inherit" }}
                 >
                   ✨ Build Itinerary
                 </button>
                 <button
-                  className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all hover:brightness-125 active:scale-95"
-                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.7)", fontFamily: "inherit" }}
+                  onClick={() => {
+                    const activeQuery = destination.trim() ? destination : CAROUSEL_PASSES[carouselIndex].defaultQuery
+                    handleSearch(activeQuery)
+                  }}
+                  className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all hover:brightness-125 active:scale-95 text-white/85 hover:text-white"
+                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", fontFamily: "inherit" }}
                 >
                   🖨 Save Plan
                 </button>
               </div>
+
+              {/* Auto-scroll progress indicator bar */}
+              {!destination.trim() && (
+                <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-white/5 overflow-hidden">
+                  <motion.div
+                    key={carouselIndex}
+                    initial={{ width: "0%" }}
+                    animate={{ width: "100%" }}
+                    transition={{ duration: 5, ease: "linear" }}
+                    className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-sky-400"
+                    style={{ boxShadow: "0 0 8px rgba(108,47,247,0.8)" }}
+                  />
+                </div>
+              )}
             </div>
           </motion.div>
         </section>

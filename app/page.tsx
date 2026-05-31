@@ -178,6 +178,10 @@ interface Activity {
   time: string
   spot: string
   desc: string
+  tips?: string
+  attire?: string
+  duration?: string
+  cost?: string
 }
 
 interface DayPlan {
@@ -222,6 +226,12 @@ const LOADING_PHRASES = [
   "✨ Building your custom AeroVibe travel blueprint...",
 ]
 
+// Helper to guarantee Rupee formatting throughout the UI
+const formatRupees = (val?: string) => {
+  if (!val) return ""
+  return val.replace(/\$/g, "₹").replace(/\bUSD\b/gi, "INR")
+}
+
 export default function Home() {
   const [view, setView] = useState<"home" | "loading" | "itinerary">("home")
   const [destination, setDestination] = useState("")
@@ -229,6 +239,12 @@ export default function Home() {
   const [loadingPhraseIndex, setLoadingPhraseIndex] = useState(0)
   const [activeTab, setActiveTab] = useState<"days" | "stays" | "food" | "tips">("days")
   const [selectedDay, setSelectedDay] = useState(1)
+  const [expandedActivityIndex, setExpandedActivityIndex] = useState<number | null>(0)
+
+  // Reset expanded activity index when day or tab changes
+  useEffect(() => {
+    setExpandedActivityIndex(0)
+  }, [selectedDay, activeTab])
 
 
 
@@ -277,6 +293,54 @@ export default function Home() {
 
   return (
     <main className="min-h-screen text-white bg-[#070712] relative overflow-hidden font-sans">
+      <style>{`
+        @media screen {
+          .print-visible-element {
+            display: none !important;
+          }
+        }
+        @media print {
+          html, body, main, .print-parent-container {
+            background: white !important;
+            color: #0f172a !important;
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: visible !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            opacity: 1 !important;
+            transform: none !important;
+          }
+          .print-hidden-element {
+            display: none !important;
+          }
+          .print-visible-element {
+            display: block !important;
+            background: white !important;
+            color: #0f172a !important;
+            width: 100% !important;
+            position: relative !important;
+          }
+          /* Strip animation opacities, scales, and transforms from all print elements */
+          .print-parent-container, .print-parent-container *, .print-visible-element, .print-visible-element * {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+            animation: none !important;
+          }
+          /* Maintain beautiful soft backgrounds during printing */
+          .print-bg-slate {
+            background-color: #f8fafc !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .print-bg-amber {
+            background-color: #fffbeb !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+        }
+      `}</style>
       <AnimatePresence mode="wait">
         
         {/* VIEW 1: LANDING/HERO PAGE */}
@@ -365,14 +429,19 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="w-full min-h-screen relative py-8 px-6 md:px-12 flex flex-col bg-gradient-to-br from-[#060613] via-[#0c0d2b] to-[#120722]"
+            className="w-full min-h-screen relative py-8 px-6 md:px-12 flex flex-col bg-gradient-to-br from-[#060613] via-[#0c0d2b] to-[#120722] print-parent-container"
           >
-            <AuroraBlobs />
-            <StarField />
+
+            <div className="print-hidden-element">
+              <AuroraBlobs />
+            </div>
+            <div className="print-hidden-element">
+              <StarField />
+            </div>
 
             {/* Grid Overlay */}
             <div
-              className="absolute inset-0 pointer-events-none"
+              className="absolute inset-0 pointer-events-none print-hidden-element"
               style={{
                 zIndex: 2,
                 backgroundImage:
@@ -384,7 +453,7 @@ export default function Home() {
               }}
             />
 
-            <div className="relative z-10 max-w-6xl w-full mx-auto flex-1 flex flex-col">
+            <div className="relative z-10 max-w-6xl w-full mx-auto flex-1 flex flex-col print-hidden-element">
               
               {/* Itinerary Header */}
               <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-8 mb-4 border-b border-white/10">
@@ -421,30 +490,6 @@ export default function Home() {
                 </div>
               </header>
 
-              {/* Demo Mode / Real-Time Sync Indicator Banner */}
-              {itinerary.isDemo ? (
-                <div 
-                  className="mb-6 p-4 rounded-2xl border border-purple-500/20 bg-purple-500/5 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
-                  style={{ boxShadow: "0 0 15px rgba(168,85,247,0.1)" }}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse" />
-                    <span className="text-purple-300 font-semibold">✨ Running in Demo Mode (Procedural Blueprint)</span>
-                  </div>
-                  <p className="text-white/60">
-                    To unlock personalized real-time AI blueprints, ensure your GEMINI_API_KEY is configured in the .env.local file.
-                  </p>
-                </div>
-              ) : (
-                <div 
-                  className="mb-6 p-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-md flex items-center gap-2 text-xs"
-                  style={{ boxShadow: "0 0 15px rgba(16,185,129,0.1)" }}
-                >
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-emerald-300 font-semibold">⚡ Real-Time AI Blueprint synced successfully using Gemini 3.5 Flash!</span>
-                </div>
-              )}
-
               {/* Main Dashboard Layout */}
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 flex-1 items-start">
                 
@@ -468,7 +513,7 @@ export default function Home() {
                           <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex-shrink-0 text-left px-4 py-3 rounded-xl text-xs font-semibold border transition-all flex items-center gap-2.5 w-full ${
+                            className={`flex-shrink-0 text-left px-4 py-3 rounded-xl text-xs font-semibold border transition-all flex items-center gap-2.5 w-auto lg:w-full ${
                               active
                                 ? "bg-white/10 border-white/20 text-white shadow-[0_0_15px_rgba(255,255,255,0.05)]"
                                 : "bg-transparent border-transparent text-white/50 hover:bg-white/5 hover:text-white"
@@ -559,11 +604,12 @@ export default function Home() {
                                 {day.activities.map((activity, idx) => (
                                   <div
                                     key={idx}
-                                    className="flex gap-4 p-5 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl hover:border-white/20 transition-all"
+                                    onClick={() => setExpandedActivityIndex(expandedActivityIndex === idx ? null : idx)}
+                                    className="cursor-pointer group flex flex-col p-5 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl hover:border-purple-500/30 transition-all duration-300"
                                   >
-                                    {/* Vertical indicator badge */}
-                                    <div className="flex flex-col items-center flex-shrink-0">
-                                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold ${
+                                    {/* Header Row (Always visible) */}
+                                    <div className="flex gap-4 items-start">
+                                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${
                                         activity.time.toLowerCase().includes("morning")
                                           ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
                                           : activity.time.toLowerCase().includes("afternoon")
@@ -572,21 +618,73 @@ export default function Home() {
                                       }`}>
                                         {activity.time.charAt(0)}
                                       </div>
-                                      <div className="w-[1px] flex-1 bg-white/10 mt-3" />
+
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between gap-2">
+                                          <span className="text-[10px] text-white/40 tracking-wider uppercase font-bold">
+                                            {activity.time}
+                                          </span>
+                                          <motion.span 
+                                            animate={{ rotate: expandedActivityIndex === idx ? 180 : 0 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="text-white/30 text-[10px] font-semibold"
+                                          >
+                                            ▼
+                                          </motion.span>
+                                        </div>
+                                        <h4 className="text-base font-bold text-white/95 mt-0.5">
+                                          {activity.spot}
+                                        </h4>
+                                        <p className="text-white/50 text-xs mt-1.5 leading-relaxed line-clamp-2 group-hover:line-clamp-none">
+                                          {activity.desc}
+                                        </p>
+                                      </div>
                                     </div>
 
-                                    {/* Activity descriptions */}
-                                    <div className="flex-1">
-                                      <span className="text-[10px] text-white/40 tracking-wider uppercase font-bold">
-                                        {activity.time}
-                                      </span>
-                                      <h4 className="text-base font-bold text-white/95 mt-0.5">
-                                        {activity.spot}
-                                      </h4>
-                                      <p className="text-white/50 text-xs mt-2 leading-relaxed">
-                                        {activity.desc}
-                                      </p>
-                                    </div>
+                                    {/* Collapsible Accordion Details */}
+                                    <AnimatePresence>
+                                      {expandedActivityIndex === idx && (
+                                        <motion.div
+                                          initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                                          animate={{ height: "auto", opacity: 1, marginTop: 16 }}
+                                          exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                                          transition={{ duration: 0.25, ease: "easeInOut" }}
+                                          className="overflow-hidden border-t border-white/5 pt-4 space-y-3"
+                                        >
+                                          {/* Duration & Cost Badges */}
+                                          <div className="flex flex-wrap gap-2 text-[10px] font-semibold">
+                                            <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/70 flex items-center gap-1">
+                                              ⏰ Recommended Time: {activity.duration || "2 Hours"}
+                                            </span>
+                                            <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/70 flex items-center gap-1">
+                                              💰 Cost: {formatRupees(activity.cost) || "Free"}
+                                            </span>
+                                          </div>
+
+                                          {/* Attire Tip */}
+                                          <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 text-xs text-white/60 flex items-start gap-2.5">
+                                            <span className="text-sm flex-shrink-0 mt-0.5">👟</span>
+                                            <div>
+                                              <span className="font-bold text-white/80 block mb-0.5">Recommended attire</span>
+                                              {activity.attire || "Comfortable walking shoes & casual layered clothing."}
+                                            </div>
+                                          </div>
+
+                                          {/* Insider Secret */}
+                                          <div 
+                                            className="p-3 rounded-xl border border-purple-500/20 bg-purple-500/5 relative overflow-hidden text-xs flex items-start gap-2.5"
+                                            style={{ boxShadow: "0 0 15px rgba(108,47,247,0.05)" }}
+                                          >
+                                            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-500/40 to-transparent" />
+                                            <span className="text-sm flex-shrink-0 mt-0.5">🤫</span>
+                                            <div>
+                                              <span className="font-bold text-purple-300 block mb-0.5">Insider local tip</span>
+                                              {activity.tips || "Walk slightly off the primary paths to discover secluded viewpoints."}
+                                            </div>
+                                          </div>
+                                        </motion.div>
+                                      )}
+                                    </AnimatePresence>
                                   </div>
                                 ))}
                               </div>
@@ -621,7 +719,7 @@ export default function Home() {
                               <p className="text-white/50 text-xs leading-relaxed mb-4">{stay.desc}</p>
                             </div>
                             <div className="text-xs font-bold text-sky-300 pt-3 border-t border-white/5">
-                              💰 Price: {stay.price}
+                              💰 Price: {formatRupees(stay.price)}
                             </div>
                           </div>
                         ))}
@@ -653,7 +751,7 @@ export default function Home() {
                               <p className="text-white/50 text-xs leading-relaxed mb-4">{item.desc}</p>
                             </div>
                             <div className="text-xs font-bold text-emerald-300 pt-3 border-t border-white/5">
-                              🏷️ Range: {item.priceRange}
+                              🏷️ Range: {formatRupees(item.priceRange)}
                             </div>
                           </div>
                         ))}
@@ -695,6 +793,142 @@ export default function Home() {
               </div>
 
             </div>
+
+            {/* Print-Only Layout Brochure */}
+            <div className="print-visible-element text-slate-900 bg-white p-8 font-sans w-full space-y-8">
+              {/* Logo / Header */}
+              <div className="border-b-4 border-slate-900 pb-4 flex justify-between items-end">
+                <div>
+                  <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 uppercase">
+                    {itinerary.destination.split("-")[0].trim()}
+                  </h1>
+                  <p className="text-xs font-bold uppercase tracking-wider text-purple-700 mt-1">
+                    AeroVibe Official AI Travel Blueprint
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span className="text-xl font-bold tracking-tight text-slate-900">🛫 AeroVibe</span>
+                  <p className="text-[9px] text-slate-500 font-medium">aerovibe.travel</p>
+                </div>
+              </div>
+
+              {/* Stays Section */}
+              {itinerary.stays && itinerary.stays.length > 0 && (
+                <div className="space-y-3">
+                  <h2 className="text-lg font-bold text-slate-900 border-b-2 border-slate-200 pb-1 flex items-center gap-1.5">
+                    🏨 Premium Stays & Lodging
+                  </h2>
+                  <div className="grid grid-cols-3 gap-4">
+                    {itinerary.stays.map((stay, idx) => (
+                      <div key={idx} className="border border-slate-300 p-4 rounded-xl flex flex-col justify-between bg-slate-50">
+                        <div>
+                          <div className="text-2xl mb-1.5">{stay.emoji}</div>
+                          <h3 className="font-bold text-slate-900 text-sm">{stay.name}</h3>
+                          <span className="inline-block text-[9px] font-bold text-purple-700 bg-purple-100 border border-purple-200 px-2 py-0.5 rounded-full my-1.5 uppercase">
+                            {stay.vibe}
+                          </span>
+                          <p className="text-[11px] text-slate-600 leading-normal">{stay.desc}</p>
+                        </div>
+                        <p className="text-[11px] font-bold text-slate-800 mt-3 pt-2 border-t border-slate-200">
+                          💰 Price: {stay.price}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Day-by-Day Complete Chronology */}
+              <div className="space-y-6">
+                <h2 className="text-lg font-bold text-slate-900 border-b-2 border-slate-200 pb-1 flex items-center gap-1.5">
+                  📅 Complete Day-by-Day Itinerary
+                </h2>
+                <div className="space-y-6">
+                  {itinerary.days.map((day) => (
+                    <div key={day.num} className="border border-slate-300 p-5 rounded-2xl bg-white space-y-4 shadow-sm" style={{ pageBreakInside: "avoid" }}>
+                      <div className="border-b border-slate-200 pb-2">
+                        <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-lg border-2 border-slate-900 text-slate-900 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                            {day.num}
+                          </span>
+                          Day {day.num}: {day.title}
+                        </h3>
+                        <p className="text-xs text-slate-600 mt-1 leading-relaxed">{day.description}</p>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        {day.activities.map((activity, idx) => (
+                          <div key={idx} className="pl-4 border-l-2 border-purple-600 py-0.5">
+                            <div className="flex items-center justify-between text-[10px] font-extrabold text-purple-800 uppercase tracking-wide">
+                              <span>⏰ {activity.time} — {activity.duration || "2 Hours"}</span>
+                              <span className="bg-slate-100 px-2 py-0.5 rounded">💰 Cost: {activity.cost || "Free"}</span>
+                            </div>
+                            <h4 className="font-bold text-slate-900 text-xs mt-1">{activity.spot}</h4>
+                            <p className="text-[11px] text-slate-700 mt-1 leading-relaxed">{activity.desc}</p>
+                            {activity.tips && (
+                              <p className="text-[10px] text-emerald-800 italic mt-1 font-medium bg-emerald-50 px-2 py-1 rounded border border-emerald-100">
+                                💡 Insider Coordinate: {activity.tips}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Culinary Secrets Section */}
+              {itinerary.food && itinerary.food.length > 0 && (
+                <div className="space-y-3" style={{ pageBreakInside: "avoid" }}>
+                  <h2 className="text-lg font-bold text-slate-900 border-b-2 border-slate-200 pb-1 flex items-center gap-1.5">
+                    🍜 Recommended Culinary Delicacies
+                  </h2>
+                  <div className="grid grid-cols-3 gap-4">
+                    {itinerary.food.map((item, idx) => (
+                      <div key={idx} className="border border-slate-300 p-4 rounded-xl flex flex-col justify-between bg-slate-50">
+                        <div>
+                          <div className="text-2xl mb-1.5">{item.emoji}</div>
+                          <h3 className="font-bold text-slate-900 text-sm">{item.dish}</h3>
+                          <p className="text-[10px] text-emerald-700 font-semibold my-1">
+                            at {item.restaurant}
+                          </p>
+                          <p className="text-[11px] text-slate-600 leading-normal">{item.desc}</p>
+                        </div>
+                        <p className="text-[11px] font-bold text-slate-800 mt-3 pt-2 border-t border-slate-200">
+                          🏷️ Cost: {item.priceRange}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Local Insights */}
+              {itinerary.tips && itinerary.tips.length > 0 && (
+                <div className="space-y-3" style={{ pageBreakInside: "avoid" }}>
+                  <h2 className="text-lg font-bold text-slate-900 border-b-2 border-slate-200 pb-1 flex items-center gap-1.5">
+                    💡 Local Secrets & Safety Insights
+                  </h2>
+                  <div className="bg-amber-50/50 border border-amber-200 rounded-xl p-5 space-y-2">
+                    {itinerary.tips.map((tip, idx) => (
+                      <div key={idx} className="flex gap-2.5 items-start text-xs text-slate-700 leading-relaxed">
+                        <span className="text-amber-600 flex-shrink-0 mt-0.5">✦</span>
+                        <p>{tip}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Footer */}
+              <div className="border-t border-slate-300 pt-4 mt-8 text-center" style={{ pageBreakInside: "avoid" }}>
+                <p className="text-[10px] text-slate-500">
+                  © {new Date().getFullYear()} AeroVibe Inc. All rights reserved. Created dynamically using advanced spatial intelligence.
+                </p>
+              </div>
+            </div>
+
           </motion.div>
         )}
       </AnimatePresence>
