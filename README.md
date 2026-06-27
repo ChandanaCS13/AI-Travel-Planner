@@ -96,7 +96,3 @@ AeroVibe is a next-generation, high-fidelity AI-powered travel planning dashboar
 5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
 ---
-
-## 📄 License
-
-This project is private and proprietary. All rights reserved.
